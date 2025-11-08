@@ -1,29 +1,28 @@
 package com.fitlife;
 
-public class PlanoMensal extends Aluno implements PlanosFit{
+public abstract class PlanoMensal implements PlanosFit{
 
-    @Override
-    public String NomePlano() {
-        return "============== PLANO MENSAL =================" +
-                "Olá " + getNome() +
-                "essas são a as caractetisticas do seu plano na nossa academia " +
-                "VALOR = 120" +
-                "HORÁRIOS MUSCULAÇÃO= 24H";
+    protected double valor;
+    protected int duracaoDias;
+
+    public PlanoMensal(double valor, int duracaoDias) {
+        this.valor = valor;
+        this.duracaoDias = duracaoDias;
     }
 
+    // Implementação comum dos getters (herdada por PlanoVip, PlanoMensal, etc.)
     @Override
     public double getValorDoPlano() {
-        return 120;
+        return valor;
     }
 
-    //PESQUISANDO COMO FAZER PARA ELE LER A DURAÇÃO ATRAVÊS DOS DIAS DOS MESES AUTOMATICAMENTE
     @Override
     public int getDuracaDeDias() {
-        return 30;
+        return duracaoDias;
     }
 
-    @Override
-    public boolean getPodeReservarArea() {
-        return false;
-    }
+    // Deixa o método de acesso exclusivo e o nome do plano para a implementação específica
+    public abstract boolean getPodeReservarArea();;
+    public abstract String NomePlano();
 }
+
