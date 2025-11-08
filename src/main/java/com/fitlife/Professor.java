@@ -1,23 +1,23 @@
 package com.fitlife;
 
 public class Professor {
-    private String id;
+    private int id;
     private String nome;
     private String registro;
     private String especializacao;
 
-    public Professor(String id, String nome, String registro, String especializacao) {
+    public Professor(int id, String nome, String registro, String especializacao) {
         this.id = id;
         this.nome = nome;
         this.registro = registro;
         this.especializacao = especializacao;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
