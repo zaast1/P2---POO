@@ -1,25 +1,24 @@
 package com.fitlife;
 
-public class PlanoMensal extends Aluno implements PlanosFit{
-
+public class PlanoAnual extends Aluno implements PlanosFit{
     @Override
     public String NomePlano() {
         return "============== PLANO MENSAL =================" +
                 "Olá " + getNome() +
                 "essas são a as caractetisticas do seu plano na nossa academia " +
-                "VALOR = 120" +
-                "HORÁRIOS MUSCULAÇÃO= 24H";
+                "VALOR = 1200" +
+                "HORÁRIOS MUSCULAÇÃO= 24H" +
+                "DIREITO DE MODALIDADES DE AULA DISTINTAS  = "; //ESPARANDO MODALIDADES DECIDIDAS
     }
 
     @Override
     public double getValorDoPlano() {
-        return 120;
+        return 1200;
     }
 
-    //PESQUISANDO COMO FAZER PARA ELE LER A DURAÇÃO ATRAVÊS DOS DIAS DOS MESES AUTOMATICAMENTE
     @Override
     public int getDuracaDeDias() {
-        return 30;
+        return 365;
     }
 
     @Override
