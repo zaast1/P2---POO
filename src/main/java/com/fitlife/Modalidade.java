@@ -1,21 +1,21 @@
 package com.fitlife;
 
 public class Modalidade {
-    private String id;
+    private int id;
     private String nome;
     private String descricao;
 
-    public Modalidade(String id, String nome, String descricao) {
+    public Modalidade(int id, String nome, String descricao) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
