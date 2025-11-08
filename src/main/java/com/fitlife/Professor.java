@@ -13,6 +13,20 @@ public class Professor {
         this.especializacao = especializacao;
     }
 
+
+    public Professor(String csvLine) {
+        String[] dados = csvLine.split(";");
+        if (dados.length == 4) {
+            this.id = Integer.parseInt(dados[0].trim());
+            this.nome = dados[1].trim();
+            this.registro = dados[2].trim();
+            this.especializacao = dados[3].trim();
+        } else {
+            throw new IllegalArgumentException("Linha CSV inválida para Professor: " + csvLine);
+        }
+    }
+
+
     public int getId() {
         return id;
     }
@@ -43,5 +57,9 @@ public class Professor {
 
     public void setEspecializacao(String especializacao) {
         this.especializacao = especializacao;
+    }
+
+    public String toCSV() {
+        return id + ";" + nome + ";" + registro + ";" + especializacao;
     }
 }

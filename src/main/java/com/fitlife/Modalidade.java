@@ -11,6 +11,25 @@ public class Modalidade {
         this.descricao = descricao;
     }
 
+    public Modalidade(String csvLine) {
+        String[] dados = csvLine.split(";");
+        if (dados.length != 3){
+            throw new IllegalArgumentException("Linha CSV inválida para Modalidade: " + csvLine);
+        }
+
+        try {
+            this.id = Integer.parseInt(dados[0].trim());
+            this.nome = dados[1].trim();
+            this.descricao = dados[2].trim();
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Erro de formato numérico no ID da Modalidade: " + csvLine);
+        }
+    }
+
+    public String toCSV() {
+        return id + ";" + nome + ";" + descricao;
+    }
+
     public int getId() {
         return id;
     }
