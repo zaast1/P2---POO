@@ -20,6 +20,11 @@ public class Aula{
         this.isExclusivaVIP = isExclusivaVIP;
     }
 
+    public String toCSV() {
+        return id + ";" + modalidade.getId() + ";" + professor.getId() +
+                ";" + horarioInicio + ";" + diaSemana + ";" + isExclusivaVIP;
+    }
+
     public int getId() {
         return id;
     }
