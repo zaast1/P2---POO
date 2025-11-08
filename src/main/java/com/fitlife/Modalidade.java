@@ -5,6 +5,11 @@ public class Modalidade {
     private String nome;
     private String descricao;
 
+    public Modalidade(String id, String nome, String descricao) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+    }
 
     public String getId() {
         return id;
