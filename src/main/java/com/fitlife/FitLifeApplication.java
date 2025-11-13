@@ -5,6 +5,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+/*
+Cada classe anotada com @Entity vira uma tabela no banco.
+
+save()      - cria ou atualiza um registro
+findAll()   - busca todos os registros
+findById()  - busca um registro pelo ID
+deleteById()- deleta um registro
+*/
+
 @SpringBootApplication
 public class FitLifeApplication {
 
@@ -12,16 +21,27 @@ public class FitLifeApplication {
         SpringApplication.run(FitLifeApplication.class, args);
     }
 
+    // Teste de Aluno
     @Bean
-    CommandLineRunner run(AlunoRepository repo) {
+    CommandLineRunner runAluno(AlunoRepository alunoRepo) {
         return args -> {
-            // Salva alguns alunos de teste
-            repo.save(new Aluno(null, "João", 25));
-            repo.save(new Aluno(null, "Maria", 30));
+            alunoRepo.save(new Aluno(null, "João", 25));
+            alunoRepo.save(new Aluno(null, "Maria", 30));
 
-            // Lista todos os alunos
             System.out.println("Lista de alunos:");
-            repo.findAll().forEach(System.out::println);
+            alunoRepo.findAll().forEach(System.out::println);
+        };
+    }
+
+    // Teste de Professor
+    @Bean
+    CommandLineRunner runProfessor(ProfessorRepository profRepo) {
+        return args -> {
+            profRepo.save(new Professor(null, "Carla Souza", "REG123", "Musculação"));
+            profRepo.save(new Professor(null, "João Silva", "REG456", "Crossfit"));
+
+            System.out.println("Lista de professores:");
+            profRepo.findAll().forEach(System.out::println);
         };
     }
 }
