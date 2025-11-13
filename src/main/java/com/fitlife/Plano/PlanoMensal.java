@@ -1,6 +1,6 @@
-package com.fitlife;
+package com.fitlife.Plano;
 
-public abstract class PlanoMensal implements PlanosFit{
+public abstract class PlanoMensal implements PlanosFit {
 
     protected double valor;
     protected int duracaoDias;

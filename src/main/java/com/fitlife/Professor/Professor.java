@@ -1,4 +1,4 @@
-package com.fitlife;
+package com.fitlife.Professor;
 import jakarta.persistence.*;
 
 @Entity

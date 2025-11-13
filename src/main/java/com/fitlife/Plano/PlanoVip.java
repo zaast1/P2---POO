@@ -1,4 +1,6 @@
-package com.fitlife;
+package com.fitlife.Plano;
+
+import com.fitlife.Aluno.Aluno;
 
 public class PlanoVip extends Aluno implements PlanosFit {
     @Override

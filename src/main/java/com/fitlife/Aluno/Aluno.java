@@ -1,4 +1,4 @@
-package com.fitlife;
+package com.fitlife.Aluno;
 
 import jakarta.persistence.*;
 

@@ -1,6 +1,8 @@
-package com.fitlife;
+package com.fitlife.Plano;
 
-public class PlanoAnual extends Aluno implements PlanosFit{
+import com.fitlife.Aluno.Aluno;
+
+public class PlanoAnual extends Aluno implements PlanosFit {
     @Override
     public String NomePlano() {
         return "============== PLANO MENSAL =================" +

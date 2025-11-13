@@ -1,4 +1,4 @@
-package com.fitlife;
+package com.fitlife.Modalidade;
 
 public class Modalidade {
     private int id;

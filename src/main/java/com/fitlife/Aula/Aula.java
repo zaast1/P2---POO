@@ -1,4 +1,7 @@
-package com.fitlife;
+package com.fitlife.Aula;
+
+import com.fitlife.Modalidade.Modalidade;
+import com.fitlife.Professor.Professor;
 
 public class Aula{
     private int id;

@@ -1,4 +1,9 @@
-package com.fitlife;
+package com.fitlife.Aula;
+import com.fitlife.Modalidade.Modalidade;
+import com.fitlife.Modalidade.ModalidadeDAO;
+import com.fitlife.Professor.Professor;
+import com.fitlife.Professor.ProfessorDAO;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

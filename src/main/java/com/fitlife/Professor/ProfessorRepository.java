@@ -1,4 +1,4 @@
-package com.fitlife;
+package com.fitlife.Professor;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

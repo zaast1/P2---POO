@@ -1,4 +1,5 @@
-package com.fitlife;
+package com.fitlife.Modalidade;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
