@@ -1,12 +1,24 @@
 package com.fitlife;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "professor")
 public class Professor {
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false, unique = true)
     private String registro;
+
+
     private String especializacao;
 
-    public Professor(int id, String nome, String registro, String especializacao) {
+    public Professor(Long id, String nome, String registro, String especializacao) {
         this.id = id;
         this.nome = nome;
         this.registro = registro;
@@ -17,7 +29,7 @@ public class Professor {
     public Professor(String csvLine) {
         String[] dados = csvLine.split(";");
         if (dados.length == 4) {
-            this.id = Integer.parseInt(dados[0].trim());
+            this.id = Long.parseLong(dados[0].trim());
             this.nome = dados[1].trim();
             this.registro = dados[2].trim();
             this.especializacao = dados[3].trim();
@@ -26,12 +38,14 @@ public class Professor {
         }
     }
 
+    public Professor() {}
 
-    public int getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
