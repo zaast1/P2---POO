@@ -1,22 +1,8 @@
 package com.fitlife.Professor;
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "professor")
 public class Professor {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String nome;
-
-    @Column(nullable = false, unique = true)
-    private String registro;
-
-
-    private String especializacao;
+    private Long id; private String nome; private String registro; private String especializacao;
 
     public Professor(Long id, String nome, String registro, String especializacao) {
         this.id = id;
@@ -24,7 +10,6 @@ public class Professor {
         this.registro = registro;
         this.especializacao = especializacao;
     }
-
 
     public Professor(String csvLine) {
         String[] dados = csvLine.split(";");
@@ -37,9 +22,6 @@ public class Professor {
             throw new IllegalArgumentException("Linha CSV inválida para Professor: " + csvLine);
         }
     }
-
-    public Professor() {}
-
 
     public Long getId() {
         return id;
