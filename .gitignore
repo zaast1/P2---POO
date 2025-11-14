@@ -31,5 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-# Banco de Dados (NÃO TIRA DAQUI GALERA!!!)
-src/main/resources/application.properties
