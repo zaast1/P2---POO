@@ -6,49 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
-abstract class Plano {
-    protected int id;
-    protected String nome;
-    public Plano(int id, String nome) { this.id = id; this.nome = nome; }
-    public int getId() { return id; }
-    // Método Polimórfico ESSENCIAL (Lógica de Acesso VIP)
-    public abstract boolean temAcessoExclusivoAulas();
-}
-
-class PlanoVip extends Plano {
-    public PlanoVip(int id) { super(id, "VIP"); }
-    @Override public boolean temAcessoExclusivoAulas() { return true; }
-}
-
-class PlanoBasico extends Plano {
-    public PlanoBasico(int id, String nome) { super(id, nome); }
-    @Override public boolean temAcessoExclusivoAulas() { return false; }
-}
-
-class Aluno {
-    private long id;
-    private String nome;
-    private Plano plano;
-
-    public Aluno(long id, String nome, Plano plano) { this.id = id; this.nome = nome; this.plano = plano; }
-    public long getId() { return id; }
-    public String getNome() { return nome; }
-    public Plano getPlano() { return plano; }
-
-    public Aluno(String csvLine) {
-        String[] dados = csvLine.split(";");
-        this.id = Long.parseLong(dados[0].trim());
-        this.nome = dados[1].trim();
-        int planoId = Integer.parseInt(dados[2].trim());
-        // Simulação do Lookup: assume plano VIP se ID for 99
-        this.plano = (planoId == 99) ? new PlanoVip(99) : new PlanoBasico(10, "Mensal");
-    }
-    public String toCSV() {
-        return id + ";" + nome + ";" + (plano != null ? plano.getId() : 0);
-    }
-}
-
 // --- CLASSE PRINCIPAL DO MEMBRO 1 (SERVIÇO DE GESTÃO) ---
 
 public class ServicoDeGestaoFitLife {
