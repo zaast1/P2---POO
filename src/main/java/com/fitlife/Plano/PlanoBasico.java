@@ -4,7 +4,7 @@ public class PlanoBasico extends Plano {
     // CONSTRUTOR CORRIGIDO: Agora aceita apenas 1 argumento (id)
     public PlanoBasico(int id) {
         // Chama o construtor da classe base (Plano) com os valores fixos:
-        super(1, "Plano Básico", 120.00, 30);
+        super(id, "Plano Básico", 120.00, 30);
     }
 
     @Override

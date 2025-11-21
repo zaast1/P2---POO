@@ -12,6 +12,11 @@ import com.fitlife.Professor.Professor;
 import java.time.LocalDateTime; // Necessário para a data/hora do check-in
 import java.time.temporal.ChronoUnit; // Necessário para calcular o período (30 dias)
 
+import com.fitlife.Aluno.Aluno;
+import com.fitlife.Aula.Aula;
+import com.fitlife.Modalidade.Modalidade;
+import com.fitlife.Professor.Professor;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
