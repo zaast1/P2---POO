@@ -4,13 +4,7 @@ import com.fitlife.Aluno.Aluno;
 import com.fitlife.Aula.Aula;
 import com.fitlife.Modalidade.Modalidade;
 import com.fitlife.Plano.Plano;
-import com.fitlife.Plano.PlanoAnual;
-import com.fitlife.Plano.PlanoMensal;
-import com.fitlife.Plano.PlanoVip;
 import com.fitlife.Professor.Professor;
-
-import java.time.LocalDateTime; // Necessário para a data/hora do check-in
-import java.time.temporal.ChronoUnit; // Necessário para calcular o período (30 dias)
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,16 +12,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// --- CLASSE PRINCIPAL DO MEMBRO 1 (SERVIÇO DE GESTÃO) ---
-
 public class ServicoDeGestaoFitLife {
 
-    // Listas em memória
+    // Listas em memória (Substituem o Banco de Dados)
     private List<Professor> professores = new ArrayList<>();
     private List<Modalidade> modalidades = new ArrayList<>();
     private List<Aula> aulas = new ArrayList<>();
     private List<Aluno> alunos = new ArrayList<>();
-    private List<Frequencia> frequencias = new ArrayList<>();
+    private List<?> frequencias = new ArrayList<>(); // Lista de Frequência do Membro 2/3
 
     // Nomes dos arquivos CSV
     private static final String PROFESSOR_ARQUIVO = "professores.csv";
@@ -36,14 +28,13 @@ public class ServicoDeGestaoFitLife {
     private static final String ALUNO_ARQUIVO = "alunos.csv";
     private static final String FREQUENCIA_ARQUIVO = "frequencias.csv";
 
-
     public ServicoDeGestaoFitLife() {
         carregarTodosDados();
-        carregarDadosSimples(FREQUENCIA_ARQUIVO, frequencias, Frequencia.class);
     }
 
     // --- MÉTODOS DE BUSCA AUXILIARES (LOOKUP) ---
 
+    // Usado na Main para simulação inicial
     public void adicionarAlunoParaTeste(Aluno aluno) {
         this.alunos.add(aluno);
     }
@@ -65,8 +56,8 @@ public class ServicoDeGestaoFitLife {
     private void carregarTodosDados() {
         carregarDadosSimples(MODALIDADE_ARQUIVO, modalidades, Modalidade.class);
         carregarDadosSimples(PROFESSOR_ARQUIVO, professores, Professor.class);
-        carregarDadosSimples(ALUNO_ARQUIVO, alunos, Aluno.class); // Carrega Alunos
-        carregarAulas(AULA_ARQUIVO); // Depende dos carregamentos acima
+        carregarDadosSimples(ALUNO_ARQUIVO, alunos, Aluno.class);
+        carregarAulas(AULA_ARQUIVO);
     }
 
     private <T> void carregarDadosSimples(String nomeArquivo, List<T> lista, Class<T> classe) {
@@ -109,6 +100,7 @@ public class ServicoDeGestaoFitLife {
                         String dia = dados[4].trim();
                         boolean isVIP = Boolean.parseBoolean(dados[5].trim());
 
+                        // Reconstrução da Composição (Lookup):
                         Optional<Modalidade> mOpt = buscarModalidadePorId(idModalidade);
                         Optional<Professor> pOpt = buscarProfessorPorId(idProfessor);
 
@@ -156,11 +148,10 @@ public class ServicoDeGestaoFitLife {
         }
     }
 
-    // --- MÉTODOS DE LÓGICA DE NEGÓCIO (CADASTRO E AGENDAMENTO) ---
+    // --- MÉTODOS DE LÓGICA DE NEGÓCIO (SUAS RESPONSABILIDADES) ---
 
     public Professor cadastrarProfessor(String nome, String registro, String especializacao) throws IllegalArgumentException {
         if (nome == null || nome.trim().isEmpty() || registro == null || registro.trim().isEmpty()) {
-            // Tratamento de Erros: Validação de entrada
             throw new IllegalArgumentException("Nome e registro do professor são obrigatórios.");
         }
 
@@ -184,7 +175,6 @@ public class ServicoDeGestaoFitLife {
     }
 
     public Aula agendarNovaAula(int modalidadeId, int professorId, String horario, String dia, boolean isVIP) throws Exception {
-        // Tratamento de Erros: Verifica se as dependências existem
         Modalidade modalidade = buscarModalidadePorId(modalidadeId)
                 .orElseThrow(() -> new Exception("Modalidade não encontrada."));
 
@@ -202,96 +192,36 @@ public class ServicoDeGestaoFitLife {
         return novaAula;
     }
 
-
-    public Aluno matricularAluno(String nome, int idade, String tipoPlano) throws IllegalArgumentException {
+    // 💡 MÉTODO FINAL DE CADASTRO DE ALUNO (INCLUI VALIDAÇÃO DE IDADE/AUTORIZAÇÃO)
+    // Este método é a versão finalizada do Membro 2, que você chamará na Main.
+    public Aluno cadastrarNovoAluno(String nome, int idade, String autorizacaoStatus, Plano planoInicial) throws IllegalArgumentException {
 
         if (nome == null || nome.trim().isEmpty() || idade <= 0) {
             throw new IllegalArgumentException("Nome e idade válidos são obrigatórios para matrícula.");
         }
-            if (idade <= 14){
-            throw new IllegalArgumentException("Matricula disponível apenas com documentão assinada por responsável e acompanhamento específico.");
-        }
 
-        // Calcula o novo ID do aluno (assume que Aluno.id é Long)
+        // --- LÓGICA DE VALIDAÇÃO DE IDADE E AUTORIZAÇÃO (REGRA DE NEGÓCIO) ---
+        if (idade < 18) {
+            if (!"SIM".equalsIgnoreCase(autorizacaoStatus)) {
+                // Se for menor de idade E não tiver autorização, LANÇA EXCEÇÃO e o cadastro falha.
+                throw new IllegalArgumentException("Aluno menor de 18 anos DEVE possuir autorização do responsável.");
+            }
+        }
+        // ----------------------------------------------------------------
+
+        // Calcula o novo ID do aluno
         long novoAlunoId = alunos.stream().mapToLong(Aluno::getId).max().orElse(0L) + 1;
 
-        // 2. Escolha e Criação do Objeto Plano (Composição)
-        Plano planoEscolhido;
-        int proximoIdPlano = 1; // ID simples para o objeto Plano, se necessário
+        // Criação do Aluno (COMPOSIÇÃO: Aluno recebe o objeto Plano)
+        Aluno novoAluno = new Aluno(novoAlunoId, nome, idade, planoInicial);
 
-        switch (tipoPlano.toUpperCase()) {
-            case "VIP":
-                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
-                planoEscolhido = new PlanoVip(proximoIdPlano);
-                break;
-            case "ANUAL":
-                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
-                planoEscolhido = new PlanoAnual(proximoIdPlano);
-                break;
-            case "MENSAL":
-                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
-                planoEscolhido = new PlanoMensal(proximoIdPlano);
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de plano inválido: " + tipoPlano);
-        }
-
-        // 3. Criação do Aluno (COMPOSIÇÃO: Aluno recebe o objeto Plano)
-        Aluno novoAluno = new Aluno(novoAlunoId, nome, idade, planoEscolhido);
-
-        // 4. Adicionar à Lista e Persistir
+        // Adicionar à Lista e Persistir
         this.alunos.add(novoAluno);
         salvarTodosDados();
 
-        System.out.println("Matrícula de " + nome + " concluída. Plano: " + tipoPlano);
         return novoAluno;
     }
 
-    // --- MÉTODOS DE MONITORAMENTO DE FREQUÊNCIA (SEU REQUISITO) ---
-
-    /**
-     * Registra a entrada (check-in) de um aluno no sistema.
-     * @param alunoId ID do aluno que está fazendo check-in.
-     */
-    public void registrarFrequencia(long alunoId) throws Exception {
-        // Usa o método de busca do Membro 1 para validar se o aluno existe
-        buscarAlunoPorId(alunoId)
-                .orElseThrow(() -> new Exception("Aluno com ID " + alunoId + " não encontrado."));
-
-        // Cria o novo registro de Frequência com a hora atual
-        Frequencia novoCheckin = new Frequencia(alunoId, LocalDateTime.now());
-
-        this.frequencias.add(novoCheckin);
-        salvarTodosDados(); // Persiste a nova lista de frequências no CSV
-        System.out.println("Check-in do Aluno ID " + alunoId + " registrado com sucesso em: " + novoCheckin.getDataHora());
-    }
-
-    /**
-     * Verifica se o aluno tem baixa assiduidade (abaixo do mínimo nos últimos 30 dias).
-     * @param alunoId ID do aluno.
-     * @return true se o aluno estiver em risco de evasão.
-     */
-    public boolean verificarBaixaAssiduidade(long alunoId) {
-
-        // Regras de Negócio para o Alerta
-        final int DIAS_PARA_ANALISE = 30;
-        final int MINIMO_CHECKINS = 4; // Menos que 4 check-ins gera alerta
-
-        LocalDateTime trintaDiasAtras = LocalDateTime.now().minusDays(DIAS_PARA_ANALISE);
-
-        // Filtragem e Contagem (Uso de Streams)
-        long totalCheckins = this.frequencias.stream()
-                .filter(f -> f.getAlunoId() == alunoId)
-                .filter(f -> f.getDataHora().isAfter(trintaDiasAtras))
-                .count();
-
-        // Emissão do Alerta
-        if (totalCheckins < MINIMO_CHECKINS) {
-            System.out.println("🚨 ALERTA DE EVASÃO: Aluno ID " + alunoId + " com apenas " + totalCheckins + " check-ins nos últimos " + DIAS_PARA_ANALISE + " dias. Ação necessária!");
-            return true;
-        }
-        return false;
-    }
 
     // --- LÓGICA DE ACESSO VIP (POLIMORFISMO) ---
 
@@ -299,18 +229,19 @@ public class ServicoDeGestaoFitLife {
         Aluno aluno = buscarAlunoPorId(alunoId).orElse(null);
 
         if (aluno == null) {
-            System.err.println("Aluno não encontrado. Apenas aulas básicas serão exibidas.");
+            // Regra de segurança: Se não achou o aluno, assume-se que é básico e esconde VIP.
             return aulas.stream().filter(aula -> !aula.isExclusivaVIP()).collect(Collectors.toList());
         }
 
         // Filtro com Lógica VIP (Polimorfismo e Open/Closed Principle)
         return aulas.stream()
                 .filter(aula -> {
+                    // Regra 1: Se a aula NÃO for exclusiva, permite acesso a todos
                     if (!aula.isExclusivaVIP()) {
                         return true;
                     }
 
-                    // Usa o método polimórfico do Plano
+                    // Regra 2: Usa o método polimórfico do Plano
                     if (aluno.getPlano() != null && aluno.getPlano().temAcessoExclusivoAulas()) {
                         return true;
                     }
@@ -332,5 +263,10 @@ public class ServicoDeGestaoFitLife {
 
     public List<Aula> getTodasAulas() {
         return new ArrayList<>(aulas);
+    }
+
+    public List<Aluno> getTodosAlunos() {
+        // Retorna uma cópia da lista de alunos.
+        return new ArrayList<>(alunos);
     }
 }
