@@ -1,10 +1,11 @@
 package com.fitlife.Plano;
 
 public class PlanoBasico extends Plano {
-    // CONSTRUTOR CORRIGIDO: Agora aceita apenas 1 argumento (id)
-    public PlanoBasico(int id) {
+
+    // CORREÇÃO: Construtor ajustado para receber ID e Nome, como a Main espera.
+    public PlanoBasico(int id, String nome) {
         // Chama o construtor da classe base (Plano) com os valores fixos:
-        super(1, "Plano Básico", 120.00, 30);
+        super(id, nome, 120.00, 30);
     }
 
     @Override
