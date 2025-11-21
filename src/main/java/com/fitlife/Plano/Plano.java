@@ -1,36 +1,29 @@
 package com.fitlife.Plano;
 
 public abstract class Plano {
-
-    //Atributos gerais que devem existir em qualquer plano
     protected int id;
+    protected String nome;
     protected double valor;
     protected int duracaoDias;
 
-    //construtor para incializar os atributos gerais
-    public Plano(int id,double valor, int duracaoDias){
-
+    public Plano(int id, String nome, double valor, int duracaoDias) {
         this.id = id;
+        this.nome = nome;
         this.valor = valor;
         this.duracaoDias = duracaoDias;
-
     }
 
-    //Método para validar acesso a aulas exclusivas
     public abstract boolean temAcessoExclusivoAulas();
-
-    //Método para validar se tem direito a reserva de áreas
     public abstract boolean getPodeReservarArea();
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public String getNome() { return nome; }
+    public double getValor() { return valor; }
+    public int getDuracaoDias() { return duracaoDias; }
 
-    public double getValor() {
-        return valor;
-    }
-
-    public int getDuracaoDias() {
-        return duracaoDias;
+    public static Plano criarPlanoPorId(int id, String nomePlano) {
+        if (id == 99 || nomePlano.toUpperCase().contains("VIP")) return new PlanoVip(id);
+        if (id == 365 || nomePlano.toUpperCase().contains("ANUAL")) return new PlanoAnual(id);
+        return new PlanoMensal(id);
     }
 }

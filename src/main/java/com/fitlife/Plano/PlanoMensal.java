@@ -1,8 +1,9 @@
 package com.fitlife.Plano;
 
-public class PlanoMensal extends Plano{
-    public PlanoMensal(int id, double valor, int duracaoDias) {
-        super(id, valor, duracaoDias);
+public class PlanoMensal extends Plano {
+
+    public PlanoMensal(int id) {
+        super(2, "Plano Mensal", 120.00, 30);
     }
 
     @Override

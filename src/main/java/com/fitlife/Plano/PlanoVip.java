@@ -1,22 +1,19 @@
 package com.fitlife.Plano;
 
-import com.fitlife.Aluno.Aluno;
-
-// Não usa a classe Plano base, apenas a interface
 public class PlanoVip extends Plano {
 
-
-    public PlanoVip(int id, double valor, int duracaoDias) {
-        super(id, valor, duracaoDias);
+    // CORRIGIDO: Aceita apenas ID e chama o super() com valores fixos
+    public PlanoVip(int id) {
+        super(4, "Plano VIP", 2640.00, 365);
     }
 
     @Override
     public boolean temAcessoExclusivoAulas() {
-        return false;
+        return true; // CORRIGIDO: Plano VIP deve liberar acesso
     }
 
     @Override
     public boolean getPodeReservarArea() {
-        return false; //Não é vip então não pode reservar a área
+        return true; // CORRIGIDO: Plano VIP deve liberar reserva
     }
 }
