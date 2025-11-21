@@ -2,11 +2,11 @@ package com.fitlife.Plano;
 
 import com.fitlife.Aluno.Aluno;
 
-public class PlanoAnual extends Aluno implements PlanosFit {
+public class PlanoAnual implements PlanosFit {
     @Override
     public String NomePlano() {
         return "============== PLANO MENSAL =================" +
-                "Olá " + getNome() +
+                "Olá " +
                 "essas são a as caractetisticas do seu plano na nossa academia " +
                 "VALOR = 1200" +
                 "HORÁRIOS MUSCULAÇÃO= 24H" +
