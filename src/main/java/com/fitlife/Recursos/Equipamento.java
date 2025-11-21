@@ -1,4 +1,4 @@
-package com.fitlife.recursos;
+package com.fitlife.Recursos;
 
 public class Equipamento {
     private int id;

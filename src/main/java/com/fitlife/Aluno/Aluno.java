@@ -5,8 +5,6 @@ public class Aluno {
     private String nome;
     private Integer idade;
 
-    public Aluno() {}
-
     public Aluno(Long id, String nome, Integer idade) {
         this.id = id;
         this.nome = nome;
