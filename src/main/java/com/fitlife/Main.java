@@ -1,5 +1,10 @@
 package com.fitlife;
 
+import com.fitlife.Aluno.Aluno;
+import com.fitlife.Aula.Aula;
+import com.fitlife.Plano.PlanoBasico;
+import com.fitlife.Plano.PlanoVip;
+
 import java.util.List;
 
 public class Main {
@@ -26,8 +31,8 @@ public class Main {
                 servico.agendarNovaAula(1, 1, "10:00", "Segunda", false); // Aula Normal
 
                 // SIMULAÇÃO DE ALUNOS (Encapsulamento corrigido)
-                servico.adicionarAlunoParaTeste(new Aluno(10L, "Carlos (Básico)", new PlanoBasico(10, "Mensal")));
-                servico.adicionarAlunoParaTeste(new Aluno(99L, "Julia (VIP)", new PlanoVip(99)));
+                servico.adicionarAlunoParaTeste(new Aluno(10L, "Carlos (Básico)",25, new PlanoBasico(1)));
+                servico.adicionarAlunoParaTeste(new Aluno(99L, "Julia (VIP)",25, new PlanoVip(4)));
                 servico.salvarTodosDados(); // Salva todos os dados, incluindo os alunos de simulação
                 System.out.println("-> Dados iniciais criados e salvos em CSV.");
             }
