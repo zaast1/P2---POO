@@ -3,45 +3,55 @@ package com.fitlife.Aluno;
 import com.fitlife.Plano.Plano;
 
 public class Aluno {
-    private long id;
+    private Long id;
     private String nome;
     private Integer idade;
     private Plano plano;
 
-    public Aluno(long id, String nome, Integer idade, Plano plano) {
+    public Aluno(Long id, String nome, Integer idade, Plano plano) {
         this.id = id;
         this.nome = nome;
         this.idade = idade;
         this.plano = plano;
     }
 
-    public Aluno(String csvLine) throws Exception {
-        String[] dados = csvLine.split(";");
-        if (dados.length != 4) {
-            throw new IllegalArgumentException("Linha CSV inválida para Aluno (Esperado 4 campos).");
-        }
+    // Getters e Setters
+    public Long getId() {
+        return id;
+    }
 
-        try {
-            this.id = Long.parseLong(dados[0].trim());
-            this.nome = dados[1].trim();
-            this.idade = Integer.parseInt(dados[2].trim());
-            int planoId = Integer.parseInt(dados[3].trim());
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-            this.plano = Plano.criarPlanoPorId(planoId, "Nome Placeholder");
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Erro de formato numérico no Aluno CSV.");
-        }
+    public Integer getIdade() {
+        return idade;
+    }
+
+    public void setIdade(Integer idade) {
+        this.idade = idade;
+    }
+    public Plano getPlano() {
+        return plano;
+    }
+
+    public void setPlano(Plano plano) {
+        this.plano = plano;
+    }
+
+    @Override
+    public String toString() {
+        return "Aluno{" + id + ", " + nome + ", " + idade + "}";
     }
 
     public String toCSV() {
-        long planoId = (plano != null) ? plano.getId() : 0;
-        return id + ";" + nome + ";" + idade + ";" + planoId;
+        return id + ";" + nome + ";" + idade + ";" + plano.getId();
     }
-
-    public long getId() { return id; }
-    public String getNome() { return nome; }
-    public Integer getIdade() { return idade; }
-    public Plano getPlano() { return plano; }
-    public void setPlano(Plano plano) { this.plano = plano; }
 }
