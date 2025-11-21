@@ -1,7 +1,6 @@
 package com.fitlife.Plano;
 
 import com.fitlife.Aluno.Aluno;
-import com.fitlife.Plano.PlanosFit;
 
 // Não usa a classe Plano base, apenas a interface
 public class PlanoVip implements PlanosFit {
