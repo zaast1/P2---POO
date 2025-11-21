@@ -3,40 +3,20 @@ package com.fitlife.Plano;
 import com.fitlife.Aluno.Aluno;
 
 // Não usa a classe Plano base, apenas a interface
-public class PlanoVip implements PlanosFit {
+public class PlanoVip extends Plano {
 
-    // ATRIBUTOS (precisam ser declarados aqui, já que não há herança de Plano)
-    private double valor;
-    private int duracaoDias;
 
-    // Construtor
-    public PlanoVip(double valor, int duracaoDias) {
-        this.valor = valor;
-        this.duracaoDias = duracaoDias;
-    }
-
-    // Implementa todos os métodos da interface PlanosFit
-    @Override
-    public String NomePlano() { /* ... */ return "Plano VIP"; }
-
-    @Override
-    public String detalharPlano(Aluno aluno) {
-        return "";
+    public PlanoVip(int id, double valor, int duracaoDias) {
+        super(id, valor, duracaoDias);
     }
 
     @Override
-    public double getValorDoPlano() {
-        return this.valor;
+    public boolean temAcessoExclusivoAulas() {
+        return false;
     }
 
-    @Override
-    public int getDuracaDeDias() {
-        return this.duracaoDias;
-    }
-
-    // O método crucial de Lógica VIP (Polimorfismo)
     @Override
     public boolean getPodeReservarArea() {
-        return true;
+        return false; //Não é vip então não pode reservar a área
     }
 }
