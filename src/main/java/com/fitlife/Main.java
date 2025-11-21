@@ -31,8 +31,8 @@ public class Main {
                 servico.agendarNovaAula(1, 1, "10:00", "Segunda", false); // Aula Normal
 
                 // SIMULAÇÃO DE ALUNOS (Encapsulamento corrigido)
-                servico.adicionarAlunoParaTeste(new Aluno(10L, "Carlos (Básico)",25, new PlanoBasico(10, 120,30)));
-                servico.adicionarAlunoParaTeste(new Aluno(99L, "Julia (VIP)",25, new PlanoVip(1345,210,30)));
+                servico.adicionarAlunoParaTeste(new Aluno(10L, "Carlos (Básico)",25, new PlanoBasico(1)));
+                servico.adicionarAlunoParaTeste(new Aluno(99L, "Julia (VIP)",25, new PlanoVip(4)));
                 servico.salvarTodosDados(); // Salva todos os dados, incluindo os alunos de simulação
                 System.out.println("-> Dados iniciais criados e salvos em CSV.");
             }

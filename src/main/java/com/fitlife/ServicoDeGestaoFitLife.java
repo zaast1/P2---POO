@@ -9,6 +9,9 @@ import com.fitlife.Plano.PlanoMensal;
 import com.fitlife.Plano.PlanoVip;
 import com.fitlife.Professor.Professor;
 
+import java.time.LocalDateTime; // Necessário para a data/hora do check-in
+import java.time.temporal.ChronoUnit; // Necessário para calcular o período (30 dias)
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +27,19 @@ public class ServicoDeGestaoFitLife {
     private List<Modalidade> modalidades = new ArrayList<>();
     private List<Aula> aulas = new ArrayList<>();
     private List<Aluno> alunos = new ArrayList<>();
+    private List<Frequencia> frequencias = new ArrayList<>();
 
     // Nomes dos arquivos CSV
     private static final String PROFESSOR_ARQUIVO = "professores.csv";
     private static final String MODALIDADE_ARQUIVO = "modalidades.csv";
     private static final String AULA_ARQUIVO = "aulas.csv";
     private static final String ALUNO_ARQUIVO = "alunos.csv";
+    private static final String FREQUENCIA_ARQUIVO = "frequencias.csv";
 
 
     public ServicoDeGestaoFitLife() {
         carregarTodosDados();
+        carregarDadosSimples(FREQUENCIA_ARQUIVO, frequencias, Frequencia.class);
     }
 
     // --- MÉTODOS DE BUSCA AUXILIARES (LOOKUP) ---
@@ -126,6 +132,7 @@ public class ServicoDeGestaoFitLife {
         salvarEntidades(PROFESSOR_ARQUIVO, professores);
         salvarEntidades(AULA_ARQUIVO, aulas);
         salvarEntidades(ALUNO_ARQUIVO, alunos);
+        salvarEntidades(FREQUENCIA_ARQUIVO, frequencias);
     }
 
     private void salvarEntidades(String nomeArquivo, List<?> lista) {
@@ -210,17 +217,20 @@ public class ServicoDeGestaoFitLife {
 
         // 2. Escolha e Criação do Objeto Plano (Composição)
         Plano planoEscolhido;
+        int proximoIdPlano = 1; // ID simples para o objeto Plano, se necessário
 
-        // Simulação dos valores e IDs de plano (Membro 2 deve definir)
         switch (tipoPlano.toUpperCase()) {
             case "VIP":
-                planoEscolhido = new PlanoVip(99, 2640.00, 365);
+                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
+                planoEscolhido = new PlanoVip(proximoIdPlano);
                 break;
             case "ANUAL":
-                planoEscolhido = new PlanoAnual(365, 1200.00, 365);
+                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
+                planoEscolhido = new PlanoAnual(proximoIdPlano);
                 break;
             case "MENSAL":
-                planoEscolhido = new PlanoMensal(30, 120.00, 30);
+                // CORRIGIDO: Chama o construtor com apenas 1 argumento (o ID)
+                planoEscolhido = new PlanoMensal(proximoIdPlano);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de plano inválido: " + tipoPlano);
@@ -235,6 +245,52 @@ public class ServicoDeGestaoFitLife {
 
         System.out.println("Matrícula de " + nome + " concluída. Plano: " + tipoPlano);
         return novoAluno;
+    }
+
+    // --- MÉTODOS DE MONITORAMENTO DE FREQUÊNCIA (SEU REQUISITO) ---
+
+    /**
+     * Registra a entrada (check-in) de um aluno no sistema.
+     * @param alunoId ID do aluno que está fazendo check-in.
+     */
+    public void registrarFrequencia(long alunoId) throws Exception {
+        // Usa o método de busca do Membro 1 para validar se o aluno existe
+        buscarAlunoPorId(alunoId)
+                .orElseThrow(() -> new Exception("Aluno com ID " + alunoId + " não encontrado."));
+
+        // Cria o novo registro de Frequência com a hora atual
+        Frequencia novoCheckin = new Frequencia(alunoId, LocalDateTime.now());
+
+        this.frequencias.add(novoCheckin);
+        salvarTodosDados(); // Persiste a nova lista de frequências no CSV
+        System.out.println("Check-in do Aluno ID " + alunoId + " registrado com sucesso em: " + novoCheckin.getDataHora());
+    }
+
+    /**
+     * Verifica se o aluno tem baixa assiduidade (abaixo do mínimo nos últimos 30 dias).
+     * @param alunoId ID do aluno.
+     * @return true se o aluno estiver em risco de evasão.
+     */
+    public boolean verificarBaixaAssiduidade(long alunoId) {
+
+        // Regras de Negócio para o Alerta
+        final int DIAS_PARA_ANALISE = 30;
+        final int MINIMO_CHECKINS = 4; // Menos que 4 check-ins gera alerta
+
+        LocalDateTime trintaDiasAtras = LocalDateTime.now().minusDays(DIAS_PARA_ANALISE);
+
+        // Filtragem e Contagem (Uso de Streams)
+        long totalCheckins = this.frequencias.stream()
+                .filter(f -> f.getAlunoId() == alunoId)
+                .filter(f -> f.getDataHora().isAfter(trintaDiasAtras))
+                .count();
+
+        // Emissão do Alerta
+        if (totalCheckins < MINIMO_CHECKINS) {
+            System.out.println("🚨 ALERTA DE EVASÃO: Aluno ID " + alunoId + " com apenas " + totalCheckins + " check-ins nos últimos " + DIAS_PARA_ANALISE + " dias. Ação necessária!");
+            return true;
+        }
+        return false;
     }
 
     // --- LÓGICA DE ACESSO VIP (POLIMORFISMO) ---

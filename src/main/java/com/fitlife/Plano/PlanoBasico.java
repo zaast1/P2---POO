@@ -1,19 +1,19 @@
 package com.fitlife.Plano;
 
 public class PlanoBasico extends Plano {
-    public PlanoBasico(int id, double valor, int duracaoDias) {
-        super(id, valor, duracaoDias);
+    // CONSTRUTOR CORRIGIDO: Agora aceita apenas 1 argumento (id)
+    public PlanoBasico(int id) {
+        // Chama o construtor da classe base (Plano) com os valores fixos:
+        super(1, "Plano Básico", 120.00, 30);
     }
 
-    // Implementação Polimórfica: Não tem acesso exclusivo a aulas VIP
     @Override
     public boolean temAcessoExclusivoAulas() {
-        return false; // Nega o acesso exclusivo
+        return false;
     }
 
-    // Implementação para o Membro 3 (Reserva de Área)
     @Override
     public boolean getPodeReservarArea() {
-        return false; // Nega reserva de área
+        return false;
     }
 }
