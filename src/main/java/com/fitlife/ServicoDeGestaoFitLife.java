@@ -108,7 +108,7 @@ public class ServicoDeGestaoFitLife {
         }
     }
 
-    private void salvarTodosDados() {
+    public void salvarTodosDados() {
         salvarEntidades(MODALIDADE_ARQUIVO, modalidades);
         salvarEntidades(PROFESSOR_ARQUIVO, professores);
         salvarEntidades(AULA_ARQUIVO, aulas);
