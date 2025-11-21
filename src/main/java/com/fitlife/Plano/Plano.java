@@ -1,5 +1,7 @@
 package com.fitlife.Plano;
 
+import com.fitlife.Aluno.Aluno;
+
 public abstract class Plano {
 
     //Atributos gerais que devem existir em qualquer plano
@@ -7,8 +9,10 @@ public abstract class Plano {
     protected double valor;
     protected int duracaoDias;
 
+    private Plano plano;
+
     //construtor para incializar os atributos gerais
-    public Plano(int id,double valor, int duracaoDias){
+    public Plano(int id, double valor, int duracaoDias) {
 
         this.id = id;
         this.valor = valor;
@@ -16,21 +20,8 @@ public abstract class Plano {
 
     }
 
-    //Método para validar acesso a aulas exclusivas
     public abstract boolean temAcessoExclusivoAulas();
-
-    //Método para validar se tem direito a reserva de áreas
     public abstract boolean getPodeReservarArea();
-
-    public int getId() {
-        return id;
-    }
-
-    public double getValor() {
-        return valor;
-    }
-
-    public int getDuracaoDias() {
-        return duracaoDias;
-    }
 }
+
+

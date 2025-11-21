@@ -1,5 +1,14 @@
 package com.fitlife;
 
+import com.fitlife.Aluno.Aluno;
+import com.fitlife.Aula.Aula;
+import com.fitlife.Modalidade.Modalidade;
+import com.fitlife.Plano.Plano;
+import com.fitlife.Plano.PlanoAnual;
+import com.fitlife.Plano.PlanoMensal;
+import com.fitlife.Plano.PlanoVip;
+import com.fitlife.Professor.Professor;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +37,10 @@ public class ServicoDeGestaoFitLife {
     }
 
     // --- MÉTODOS DE BUSCA AUXILIARES (LOOKUP) ---
+
+    public void adicionarAlunoParaTeste(Aluno aluno) {
+        this.alunos.add(aluno);
+    }
 
     public Optional<Professor> buscarProfessorPorId(int id) {
         return professores.stream().filter(p -> p.getId() == id).findFirst();
@@ -180,6 +193,48 @@ public class ServicoDeGestaoFitLife {
         aulas.add(novaAula);
         salvarTodosDados();
         return novaAula;
+    }
+
+
+    public Aluno matricularAluno(String nome, int idade, String tipoPlano) throws IllegalArgumentException {
+
+        if (nome == null || nome.trim().isEmpty() || idade <= 0) {
+            throw new IllegalArgumentException("Nome e idade válidos são obrigatórios para matrícula.");
+        }
+            if (idade <= 14){
+            throw new IllegalArgumentException("Matricula disponível apenas com documentão assinada por responsável e acompanhamento específico.");
+        }
+
+        // Calcula o novo ID do aluno (assume que Aluno.id é Long)
+        long novoAlunoId = alunos.stream().mapToLong(Aluno::getId).max().orElse(0L) + 1;
+
+        // 2. Escolha e Criação do Objeto Plano (Composição)
+        Plano planoEscolhido;
+
+        // Simulação dos valores e IDs de plano (Membro 2 deve definir)
+        switch (tipoPlano.toUpperCase()) {
+            case "VIP":
+                planoEscolhido = new PlanoVip(99, 2640.00, 365);
+                break;
+            case "ANUAL":
+                planoEscolhido = new PlanoAnual(365, 1200.00, 365);
+                break;
+            case "MENSAL":
+                planoEscolhido = new PlanoMensal(30, 120.00, 30);
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de plano inválido: " + tipoPlano);
+        }
+
+        // 3. Criação do Aluno (COMPOSIÇÃO: Aluno recebe o objeto Plano)
+        Aluno novoAluno = new Aluno(novoAlunoId, nome, idade, planoEscolhido);
+
+        // 4. Adicionar à Lista e Persistir
+        this.alunos.add(novoAluno);
+        salvarTodosDados();
+
+        System.out.println("Matrícula de " + nome + " concluída. Plano: " + tipoPlano);
+        return novoAluno;
     }
 
     // --- LÓGICA DE ACESSO VIP (POLIMORFISMO) ---
