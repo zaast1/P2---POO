@@ -1,19 +1,10 @@
 package com.fitlife.Plano;
-
 public class PlanoVip extends Plano {
-
-    // CORRIGIDO: Aceita apenas ID e chama o super() com valores fixos
     public PlanoVip(int id) {
-        super(4, "Plano VIP", 2640.00, 365);
+        super(4, "Plano VIP", 2640.00, 365); // O plano que paga nosso salário
     }
-
     @Override
-    public boolean temAcessoExclusivoAulas() {
-        return true; // CORRIGIDO: Plano VIP deve liberar acesso
-    }
-
+    public boolean temAcessoExclusivoAulas() { return true; } // VIP pode tudo
     @Override
-    public boolean getPodeReservarArea() {
-        return true; // CORRIGIDO: Plano VIP deve liberar reserva
-    }
+    public boolean getPodeReservarArea() { return true; }
 }

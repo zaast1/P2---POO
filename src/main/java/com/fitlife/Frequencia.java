@@ -3,6 +3,7 @@ package com.fitlife;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+// Classe para saber quem está malhando e quem está só pagando e dormindo em casa.
 public class Frequencia {
     private long alunoId;
     private LocalDateTime dataHora;
@@ -16,9 +17,7 @@ public class Frequencia {
 
     public Frequencia(String csvLine) throws Exception {
         String[] dados = csvLine.split(";");
-        if (dados.length != 2) {
-            throw new IllegalArgumentException("Linha CSV inválida para Frequencia.");
-        }
+        if (dados.length != 2) throw new IllegalArgumentException("Linha CSV inválida para Frequencia.");
 
         this.alunoId = Long.parseLong(dados[0].trim());
         this.dataHora = LocalDateTime.parse(dados[1].trim(), FORMATTER);
@@ -28,11 +27,6 @@ public class Frequencia {
         return alunoId + ";" + dataHora.format(FORMATTER);
     }
 
-    public long getAlunoId() {
-        return alunoId;
-    }
-
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
+    public long getAlunoId() { return alunoId; }
+    public LocalDateTime getDataHora() { return dataHora; }
 }

@@ -1,114 +1,76 @@
-README – Sistema de Gestão FitLife (Projeto POO)
-Este projeto implementa um sistema básico de gerenciamento para uma academia, desenvolvido em Java como parte da disciplina de Programação Orientada a Objetos (POO). O objetivo principal é demonstrar conceitos fundamentais de POO, como herança, polimorfismo, abstração, encapsulamento, além de simular persistência de dados utilizando arquivos CSV.
+# 🏋️ Sistema de Gestão FitLife
 
-Descrição Geral do Sistema
-O sistema é dividido em módulos que gerenciam alunos, aulas, professores, modalidades, frequência e operações financeiras. A arquitetura foi organizada de forma a separar claramente as classes de domínio e as regras de negócio, utilizando serviços para realizar o carregamento e a persistência dos dados.
+> Projeto final da disciplina de **Programação Orientada a Objetos (POO)**.
 
-Funcionalidades Principais
-1. Polimorfismo e Regras de Acesso (Planos de Academia)
-   O sistema modela diferentes tipos de planos de assinatura, utilizando polimorfismo para definir regras de acesso:
-   A classe abstrata Plano define o comportamento padrão e força suas subclasses a implementarem regras específicas de acesso.
+O **FitLife** é um sistema de gerenciamento de academia baseado em console, desenvolvido em Java, que aplica conceitos fundamentais como Polimorfismo, Herança, Encapsulamento e Persistência de Dados. O sistema visa substituir controles manuais por uma solução automatizada e integrada.
 
+---
 
-As subclasses PlanoVip, PlanoMensal e PlanoAnual sobrescrevem o método temAcessoExclusivoAulas().
+## 📋 Funcionalidades
 
+O sistema é dividido em módulos integrados acessíveis via menu principal:
 
-O PlanoVip concede acesso liberado às aulas exclusivas, enquanto os demais planos aplicam restrições.
+### 1. Gestão Administrativa (CRUD)
+* **Cadastros:** Alunos, Professores, Modalidades e Aulas.
+* **Edição e Remoção:** Permite atualizar dados (como nome/idade) e excluir registros do sistema.
+* **Agendamento:** Criação de grade de aulas vinculando modalidade, professor e horário.
+* **Validação de Negócio:** Bloqueio de cadastro de menores de 18 anos sem autorização expressa.
 
+### 2. Controle de Acesso e Planos (Polimorfismo)
+* **Lógica VIP:** Implementação de regras de acesso baseadas no tipo de plano.
+* Alunos **VIP** (Polimorfismo) têm acesso irrestrito a aulas exclusivas e reservas.
+* Alunos **Básicos/Mensais** visualizam apenas a grade padrão.
 
-A classe Aluno mantém internamente um objeto do tipo Plano, e os serviços chamam métodos polimórficos sem precisar saber qual plano está associado ao aluno.
+### 3. Módulo Financeiro Integrado
+* **Fluxo de Caixa:** Registro de pagamentos de mensalidades com data e valor.
+* **Integridade:** O sistema valida se o Aluno existe na base de dados antes de processar qualquer pagamento.
+* **Status:** Consulta rápida para verificar se o aluno está em dia ou pendente.
 
+### 4. Relatórios e Persistência
+* **Relatórios em PDF:** Geração de relatórios gerenciais completos (Listas de alunos, professores e modalidades) utilizando a biblioteca **iText**.
+* **Persistência em CSV:** Todos os dados são salvos automaticamente em arquivos locais (`alunos.csv`, `transacoes.csv`, etc.), garantindo que as informações persistam entre as execuções.
 
-2. Gestão de Domínio e Persistência em CSV
-   Os dados do sistema são armazenados e carregados através de arquivos CSV, simulando a persistência de um banco de dados simples.
-   As principais entidades são:
-   Aluno
+---
 
+## 🛠️ Tecnologias Utilizadas
 
-Professor
+* **Linguagem:** Java (JDK 17+)
+* **Gerenciamento:** Maven
+* **Bibliotecas Externas:**
+    * `iText PDF (v5.5.13.4)` - Para geração de documentos PDF.
+* **Conceitos:** Java IO (Leitura/Escrita de Arquivos), Java Streams API (para relatórios financeiros e filtros), POO Completa.
 
+---
 
-Modalidade
+## 🚀 Como Executar o Projeto
 
+### Pré-requisitos
+1.  Ter o **Java JDK** instalado.
+2.  Uma IDE Java (IntelliJ IDEA recomendado).
+3.  Conexão com internet (para o Maven baixar o iText na primeira execução).
 
-Aula
+### Passo a Passo
+1.  **Clonar/Baixar:** Faça o download deste repositório.
+2.  **Abrir:** Abra a pasta do projeto na sua IDE.
+3.  **Dependências:**
+    * O projeto utiliza **Maven**. Ao abrir, aguarde o IntelliJ/Eclipse baixar as dependências listadas no `pom.xml` (especificamente o iText).
+4.  **Executar:**
+    * Localize a classe principal: `src/main/java/com/fitlife/Main.java`.
+    * Execute o método `main`.
+5.  **Utilização:**
+    * O sistema criará automaticamente os arquivos `.csv` na raiz do projeto caso eles não existam.
+    * Navegue pelo menu numérico no console para acessar as funcionalidades.
 
+---
 
-Frequencia
+## 👥 Autores (Equipe)
 
+* **Pedro Henrique Rodrigues Jacques Pinheiro** - *Configuração Central, Gestão de Aulas e Lógica de Serviço.*
+* **José Airton Rodrigues Galdino Júnior** - *Hierarquia de Planos, Lógica de Alunos e Regras de Validação.*
+* **Gabriel do Rego Lima Menezes** - *Módulo de Recursos Físicos e Validação de Histórico.*
+* **Henrique França de Souza Medeiros Maranguape** - *Módulo Financeiro e Cálculos de Receita.*
+* **Marina de Lima Fonseca** - *Implementação de Relatórios PDF (iText) e Documentação.*
 
-Transacao
+---
 
-
-A lógica de leitura e escrita desses dados é organizada nos serviços:
-ServicoDeGestaoFitLife
-
-
-ServicoFinanceiro
-
-
-Esses serviços centralizam a lógica de negócio e garantem a separação de responsabilidades.
-3. Módulo Financeiro e Relatórios com Java Streams
-   O sistema registra pagamentos através da classe Transacao, que contém informações sobre valores, datas e categorias.
-   A classe RelatorioFinanceiro utiliza Java Streams para:
-   Calcular a receita total
-
-
-Agregar valores por tipo de plano
-
-
-Gerar relatórios compactos no estilo BI (Business Intelligence)
-
-
-A abordagem com Streams permite consultas declarativas, concisas e eficientes.
-4. Controle de Frequência
-   A classe Frequencia registra entradas e saídas de alunos, associando cada registro a um aluno específico por meio de seu identificador.
-   Isso permite acompanhar presença, pontualidade e movimentação interna da academia.
-
-Estrutura de Classes (Descrição Simplificada)
-A tabela abaixo apresenta um resumo textual das classes principais e seus papéis no sistema.
-Classe                    | Conceitos de POO aplicados           | Responsabilidade
-------------------------- | ------------------------------------ | -------------------------------
-Plano (abstract)          | Abstração, herança, polimorfismo     | Modelo base para regras de planos
-Aluno                     | Encapsulamento, associação           | Armazena dados do aluno e referência ao plano
-ServicoDeGestaoFitLife    | SRP, serviços de negócio             | Gerencia acesso, cadastros e persistência CSV
-RelatorioFinanceiro       | Java Streams                          | Gera relatórios financeiros e cálculos agregados
-Modalidade, Professor     | Encapsulamento                        | Representam entidades de domínio
-Aula                      | Encapsulamento                        | Relaciona modalidades e professores
-Transacao                 | Encapsulamento                        | Registra operações financeiras
-Frequencia                | Encapsulamento                        | Registra presença e horários
-
-
-Como Executar o Projeto
-Certifique-se de ter o JDK instalado e configurado.
-
-
-Abra o projeto no IntelliJ IDEA.
-
-
-Compile o projeto normalmente usando o menu Build ou através do Maven se estiver configurado.
-
-
-Para executar o módulo de gestão:
-
-
-Execute a classe:
-com.fitlife.Main
-
-
-Para executar o módulo financeiro:
-
-
-Execute a classe:
-com.fitlife.MainFinanceiro
-
-
-Os dados de teste serão criados automaticamente se os arquivos CSV não existirem.
-Caso existam, serão carregados dos seguintes arquivos:
-professores.csv
-modalidades.csv
-aulas.csv
-alunos.csv
-transacoes.csv
-frequencias.csv
-
+**Nota:** Projeto desenvolvido para fins avaliativos da P2 de POO - 2025.

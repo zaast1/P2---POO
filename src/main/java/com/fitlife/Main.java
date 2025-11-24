@@ -2,254 +2,321 @@ package com.fitlife;
 
 import com.fitlife.Aluno.Aluno;
 import com.fitlife.Aula.Aula;
+import com.fitlife.Modalidade.Modalidade;
 import com.fitlife.Plano.Plano;
 import com.fitlife.Plano.PlanoBasico;
 import com.fitlife.Plano.PlanoVip;
+import com.fitlife.Professor.Professor;
+
 import java.util.InputMismatchException;
-import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
 
+    // Onde tudo começa e onde tudo termina (se o usuário quiser).
     private static ServicoDeGestaoFitLife servico;
+    private static ServicoFinanceiro servicoFinanceiro;
+    private static RelatorioFinanceiro relatorioFinanceiro;
     private static Scanner scanner;
 
     public static void main(String[] args) {
-        // Inicializa o serviço e o scanner
+        // Inicializando os módulos (Injeção de Dependência Manual, vulgo "Na unha")
         servico = new ServicoDeGestaoFitLife();
+        servicoFinanceiro = new ServicoFinanceiro(servico);
+        relatorioFinanceiro = new RelatorioFinanceiro(servico, servicoFinanceiro);
         scanner = new Scanner(System.in);
+        inicializarDadosTeste();
 
-        System.out.println("\n=============================================");
-        System.out.println("  FITLIFE-ACADEMIA - INTERFACE DE ADMINISTRAÇÃO");
-        System.out.println("=============================================");
-
-        // Garante que haja dados mínimos para o teste VIP (se o CSV estiver vazio).
-        inicializarDadosDeExemplo();
-
-        exibirMenuPrincipal();
-    }
-
-    private static void inicializarDadosDeExemplo() {
-        try {
-            // Se as modalidades não foram carregadas do CSV, cria dados de teste
-            if (servico.getTodasModalidades().isEmpty()) {
-                System.out.println("-> Criando dados iniciais de TESTE (Necessário para a Lógica VIP)...");
-
-                // Cadastro de Dados Mestres
-                servico.cadastrarModalidade("Musculação", "Treino de força");
-                servico.cadastrarModalidade("Pilates Exclusivo", "Aula VIP");
-                servico.cadastrarProfessor("Ana Souza", "R1", "Musculação");
-
-                // Agendamento de Aulas
-                servico.agendarNovaAula(2, 1, "08:00", "Segunda", true); // Aula VIP (Modalidade ID 2)
-                servico.agendarNovaAula(1, 1, "10:00", "Segunda", false); // Aula Normal (Modalidade ID 1)
-
-                // Simulação de Alunos para Teste VIP (IDs 10=Básico, 99=VIP)
-                servico.adicionarAlunoParaTeste(new Aluno(10L, "Carlos (Básico)", 25, new PlanoBasico(10, "Mensal")));
-                servico.adicionarAlunoParaTeste(new Aluno(99L, "Julia (VIP)", 30, new PlanoVip(99)));
-                servico.salvarTodosDados(); // Salva dados de teste
-                System.out.println("-> Dados de teste salvos. Pronto para o Teste VIP.");
-            }
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar dados de teste: " + e.getMessage());
-        }
-    }
-
-    private static void exibirMenuPrincipal() {
         int opcao = -1;
+        // O Loop Infinito da Alegria
         while (opcao != 0) {
-            System.out.println("\n--- MENU ---");
-            System.out.println("1. ➕ Cadastrar Novo Professor");
-            System.out.println("2. 🧘‍♀️ Cadastrar Nova Modalidade");
-            System.out.println("3. 📅 Agendar Nova Aula (Teste de Cadastro)");
-            System.out.println("4. 🔎 Testar Lógica de Acesso VIP (Demo POO)");
-            System.out.println("5. 🧑‍🎓 Cadastrar Novo Aluno");
-            System.out.println("0. ❌ Sair");
-            System.out.print("Escolha uma opção: ");
+            System.out.println("\n=== 🏋️ FITLIFE ACADEMIA - SISTEMA SUPREMO ===");
+            System.out.println("1. 📝 Área de Cadastros");
+            System.out.println("2. 👁️ Área de Listagem");
+            System.out.println("3. ✏️  Área de Edição");
+            System.out.println("4. 🗑️  Área de Exclusão");
+            System.out.println("5. 📄 Gerar Relatório PDF");
+            System.out.println("-----------------------------------");
+            System.out.println("6. 💰 MÓDULO FINANCEIRO ");
+            System.out.println("-----------------------------------");
+            System.out.println("0. ❌ Sair e Salvar");
+            System.out.print("Escolha seu destino: ");
 
             try {
                 opcao = scanner.nextInt();
-                scanner.nextLine(); // Consome a linha pendente
+                scanner.nextLine();
 
                 switch (opcao) {
-                    case 1: cadastrarProfessorInterativo(); break;
-                    case 2: cadastrarModalidadeInterativo(); break;
-                    case 3: agendarAulaInterativo(); break;
-                    case 4: testarFiltroVIP(); break;
-                    case 5: cadastrarAlunoInterativo(); break;
+                    case 1: menuCadastros(); break;
+                    case 2: menuExibicao(); break;
+                    case 3: menuEdicao(); break;
+                    case 4: menuRemocao(); break;
+                    case 5: gerarRelatorioPDF(); break;
+                    case 6: menuFinanceiro(); break;
                     case 0:
-                        System.out.println("Sistema encerrado. Dados salvos.");
+                        System.out.println("Salvando dados... Não desligue o computador.");
                         servico.salvarTodosDados();
                         break;
-                    default: System.out.println("Opção inválida.");
+                    default: System.out.println("Opção inválida. Tente acertar o dedo na tecla.");
                 }
             } catch (InputMismatchException e) {
-                System.err.println("Entrada inválida. Digite um número.");
+                System.out.println("Eu pedi um NÚMERO, não uma letra!");
                 scanner.nextLine();
             }
         }
     }
 
-    // --- MÉTODOS DE CADASTRO INTERATIVO (Requisito: Tratamento de Erros e Regra de Negócio) ---
+    // --- SUB-MENUS (Organização é tudo) ---
 
-    private static void cadastrarProfessorInterativo() {
-        try {
-            System.out.print("Nome do Professor: ");
-            String nome = scanner.nextLine();
-            System.out.print("Registro (Ex: R200): ");
-            String registro = scanner.nextLine();
-            System.out.print("Especialização: ");
-            String esp = scanner.nextLine();
-
-            servico.cadastrarProfessor(nome, registro, esp);
-            System.out.println("✅ Professor cadastrado com sucesso!");
-        } catch (IllegalArgumentException e) {
-            System.err.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
-        }
-    }
-
-    private static void cadastrarModalidadeInterativo() {
-        try {
-            System.out.print("Nome da Modalidade: ");
-            String nome = scanner.nextLine();
-            System.out.print("Descrição: ");
-            String desc = scanner.nextLine();
-
-            servico.cadastrarModalidade(nome, desc);
-            System.out.println("✅ Modalidade cadastrada com sucesso!");
-        } catch (IllegalArgumentException e) {
-            System.err.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
-        }
-    }
-
-    private static void agendarAulaInterativo() {
-        try {
-            System.out.println("\n--- AGENDAR AULA ---");
-            System.out.println("Modalidades disponíveis:");
-            servico.getTodasModalidades().forEach(m -> System.out.println(" ID " + m.getId() + ": " + m.getNome()));
-
-            System.out.print("ID da Modalidade: ");
-            int modId = scanner.nextInt();
-
-            System.out.println("Professores disponíveis:");
-            servico.getTodosProfessores().forEach(p -> System.out.println(" ID " + p.getId() + ": " + p.getNome()));
-
-            System.out.print("ID do Professor: ");
-            int profId = scanner.nextInt();
-            scanner.nextLine();
-
-            System.out.print("Horário (Ex: 18:00): ");
-            String horario = scanner.nextLine();
-
-            System.out.print("É aula VIP (true/false)? ");
-            boolean isVIP = scanner.nextBoolean();
-
-            servico.agendarNovaAula(modId, profId, horario, "Terça", isVIP);
-            System.out.println("✅ Aula agendada com sucesso!");
-
-        } catch (InputMismatchException e) {
-            System.err.println("Entrada numérica inválida.");
-            scanner.nextLine();
-        } catch (Exception e) {
-            System.err.println("ERRO: Falha ao agendar: " + e.getMessage());
-        }
-    }
-
-    private static void cadastrarAlunoInterativo() {
-        try {
-            System.out.println("\n--- CADASTRO DE ALUNO ---");
-            System.out.print("Nome do Aluno: ");
-            String nome = scanner.nextLine();
-            System.out.print("Idade: ");
-            int idade = scanner.nextInt();
-            scanner.nextLine();
-
-            String autorizacao = "SIM"; // Padrão
-
-            // --- Lógica Interativa de Validação de Idade ---
-            if (idade < 18) {
-                System.out.println("⚠️ Aluno inferior a 18 anos deve conter autorização do responsável.");
-                System.out.print("O aluno trouxe a autorização? (SIM/NAO): ");
-                autorizacao = scanner.nextLine().toUpperCase();
-
-                // --- VALIDAÇÃO IMEDIATA E CANCELAMENTO ---
-                if (!"SIM".equals(autorizacao)) {
-                    // Lança exceção e o bloco catch final impede a continuidade
-                    throw new IllegalArgumentException("Cadastro CANCELADO. Menor de idade sem autorização do responsável.");
-                }
-                // Se trouxe SIM, a execução continua normalmente.
-            }
-            // ----------------------------------------
-
-            System.out.println("Escolha o Plano:");
-            System.out.println(" [1] Plano Básico (Mensal)");
-            System.out.println(" [2] Plano VIP (Exclusivo)");
+    private static void menuFinanceiro() {
+        int opFin = -1;
+        while (opFin != 0) {
+            System.out.println("\n--- 💰 MÓDULO FINANCEIRO ---");
+            System.out.println("1. Registrar Pagamento");
+            System.out.println("2. Consultar Status Aluno");
+            System.out.println("3. Relatório de Receita");
+            System.out.println("0. Voltar");
             System.out.print("Opção: ");
-            int planoOpcao = scanner.nextInt();
-            scanner.nextLine();
 
-            Plano planoEscolhido;
-            if (planoOpcao == 2) {
-                planoEscolhido = new PlanoVip(99);
-            } else {
-                planoEscolhido = new PlanoBasico(10, "Mensal");
+            try {
+                opFin = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (opFin) {
+                    case 1: registrarPagamento(); break;
+                    case 2: consultarStatusPagamento(); break;
+                    case 3: relatorioFinanceiro.gerarRelatorio(); break;
+                    case 0: System.out.println("Voltando..."); break;
+                    default: System.out.println("Opção inválida.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Erro: Número, por favor.");
+                scanner.nextLine();
             }
-
-            // Chama o método no serviço, que contém a lógica de validação e persistência
-            servico.cadastrarNovoAluno(nome, idade, autorizacao, planoEscolhido);
-            System.out.println("✅ Aluno cadastrado com sucesso! ID: " + servico.getTodosAlunos().stream().mapToLong(Aluno::getId).max().orElse(0L));
-
-        } catch (InputMismatchException e) {
-            System.err.println("ERRO: Entrada numérica inválida para Idade ou opção de plano.");
-            scanner.nextLine();
-        } catch (IllegalArgumentException e) {
-            System.err.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
-            System.out.println("❌ Cadastro CANCELADO. O aluno não foi salvo no CSV.");
         }
     }
 
+    private static void registrarPagamento() {
+        try {
+            System.out.print("ID do Aluno (Quem está pagando?): ");
+            long idAluno = scanner.nextLong(); scanner.nextLine();
 
-    // --- DEMONSTRAÇÃO DO FILTRO VIP (Requisito 2 / Prova de POO) ---
+            // Validação de Integridade: Só recebe se o aluno existir
+            Optional<Aluno> alunoOpt = servico.buscarAlunoPorId(idAluno);
 
-    private static void testarFiltroVIP() {
-        System.out.println("\n====================================================");
-        System.out.println(" 🔎 TESTE DE ACESSO VIP (Prova de Polimorfismo)");
-        System.out.println("====================================================");
-
-        // 1. Busca TODOS os alunos (Incluindo os cadastrados manualmente)
-        List<Aluno> todosAlunos = servico.getTodosAlunos();
-
-        if (todosAlunos.isEmpty()) {
-            System.out.println("Nenhum aluno encontrado para teste. Cadastre um aluno primeiro (Opção 5).");
-            return;
-        }
-
-        // 2. Percorre cada aluno e testa o acesso
-        for (Aluno aluno : todosAlunos) {
-            System.out.println("\n----------------------------------------------------");
-
-            String nomePlano = (aluno.getPlano() != null) ? aluno.getPlano().getNome() : "Sem Plano";
-
-            System.out.println("👤 Aluno: " + aluno.getNome() + " (ID: " + aluno.getId() + ")");
-            System.out.println("🎫 Plano Atual: " + nomePlano);
-
-            // Chama a lógica VIP do seu serviço
-            List<Aula> aulasLiberadas = servico.listarAulasDisponiveis(aluno.getId());
-
-            System.out.println("📚 Aulas Disponíveis para este aluno: " + aulasLiberadas.size());
-
-            if (aulasLiberadas.isEmpty()) {
-                System.out.println("   (Nenhuma aula disponível)");
-            } else {
-                for (Aula a : aulasLiberadas) {
-                    String statusVIP = a.isExclusivaVIP() ? "[👑 AULA VIP]" : "[✅ AULA NORMAL]";
-                    // Se o aluno viu a aula VIP, é porque o polimorfismo funcionou
-                    System.out.println("   " + statusVIP + " " + a.getModalidade().getNome() +
-                            " (" + a.getHorarioInicio() + ")");
-                }
+            if (alunoOpt.isEmpty()) {
+                System.out.println("❌ Aluno fantasma! Cadastre ele primeiro.");
+                return;
             }
+
+            Aluno aluno = alunoOpt.get();
+            String nomePlano = (aluno.getPlano() != null) ? aluno.getPlano().getNome() : "Avulso";
+            System.out.println(">> Recebendo de: " + aluno.getNome() + " (" + nomePlano + ")");
+
+            System.out.print("Valor (R$): ");
+            double valor = scanner.nextDouble(); scanner.nextLine();
+
+            System.out.print("Data (dd/MM/aaaa): ");
+            String data = scanner.nextLine();
+
+            servicoFinanceiro.registrarPagamento(valor, data, idAluno, nomePlano);
+            System.out.println("✅ Pagamento registrado!");
+
+        } catch (Exception e) {
+            System.out.println("Erro no pagamento: " + e.getMessage());
+            scanner.nextLine();
         }
-        System.out.println("\n====================================================");
-        System.out.println("✅ Teste concluído para " + todosAlunos.size() + " alunos.");
+    }
+
+    private static void consultarStatusPagamento() {
+        System.out.print("ID do Aluno: ");
+        long id = scanner.nextLong(); scanner.nextLine();
+        boolean pagou = servicoFinanceiro.checarStatusPagamento(id);
+        if (pagou) System.out.println("✅ Status: OK (Pagou, tá liberado).");
+        else System.out.println("⚠️ Status: Pendente (Barrado na catraca).");
+    }
+
+    // --- OUTROS MENUS ---
+
+    private static void menuCadastros() {
+        System.out.println("\n--- 📝 CADASTROS ---");
+        System.out.println("1. Novo Aluno");
+        System.out.println("2. Novo Professor");
+        System.out.println("3. Nova Modalidade");
+        System.out.println("4. Nova Aula");
+        System.out.print("Opção: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (op) {
+            case 1: cadastrarAluno(); break;
+            case 2: cadastrarProfessor(); break;
+            case 3: cadastrarModalidade(); break;
+            case 4: agendarAula(); break;
+            default: System.out.println("Inválido.");
+        }
+    }
+
+    private static void menuExibicao() {
+        System.out.println("\n--- 👁️ EXIBIÇÃO ---");
+        System.out.println("1. Listar Alunos");
+        System.out.println("2. Listar Professores");
+        System.out.println("3. Listar Modalidades");
+        System.out.println("4. Listar Aulas");
+        System.out.print("Opção: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (op) {
+            case 1:
+                System.out.println("\nLISTA DE ALUNOS:");
+                for(Aluno a : servico.getTodosAlunos()){
+                    String plano = (a.getPlano() != null) ? a.getPlano().getNome() : "Sem Plano";
+                    String destaque = plano.toUpperCase().contains("VIP") ? " ⭐ VIP" : "";
+                    System.out.printf("ID: %d | Nome: %s | Plano: %s%s\n", a.getId(), a.getNome(), plano, destaque);
+                }
+                break;
+            case 2:
+                System.out.println("\nLISTA DE PROFESSORES:");
+                servico.getTodosProfessores().forEach(p ->
+                        System.out.println("ID: " + p.getId() + " | Nome: " + p.getNome()));
+                break;
+            case 3:
+                System.out.println("\nLISTA DE MODALIDADES:");
+                servico.getTodasModalidades().forEach(m ->
+                        System.out.println("ID: " + m.getId() + " | " + m.getNome()));
+                break;
+            case 4:
+                System.out.println("\nGRADE DE AULAS:");
+                servico.getTodasAulas().forEach(a ->
+                        System.out.println(a.getDiaSemana() + " - " + a.getHorarioInicio() + ": " + a.getModalidade().getNome()));
+                break;
+        }
+    }
+
+    private static void menuEdicao() {
+        System.out.println("\n--- ✏️ EDIÇÃO ---");
+        System.out.println("1. Editar Aluno");
+        System.out.println("2. Editar Professor");
+        System.out.println("3. Editar Modalidade");
+        System.out.print("Opção: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            if (op == 1) {
+                System.out.print("ID do Aluno: ");
+                long id = scanner.nextLong(); scanner.nextLine();
+                System.out.print("Novo Nome (Enter para manter): ");
+                String nome = scanner.nextLine();
+                System.out.print("Nova Idade (0 para manter): ");
+                int idade = scanner.nextInt();
+                servico.editarAluno(id, nome, idade);
+            } else if (op == 2) {
+                System.out.print("ID do Professor: ");
+                int id = scanner.nextInt(); scanner.nextLine();
+                System.out.print("Novo Nome (Enter para manter): ");
+                String nome = scanner.nextLine();
+                System.out.print("Nova Especialidade (Enter para manter): ");
+                String esp = scanner.nextLine();
+                servico.editarProfessor(id, nome, esp);
+            } else if (op == 3) {
+                System.out.print("ID da Modalidade: ");
+                int id = scanner.nextInt(); scanner.nextLine();
+                System.out.print("Novo Nome: ");
+                String nome = scanner.nextLine();
+                System.out.print("Nova Descrição: ");
+                String desc = scanner.nextLine();
+                servico.editarModalidade(id, nome, desc);
+            }
+            System.out.println("✅ Editado com sucesso!");
+        } catch (Exception e) {
+            System.out.println("❌ Erro ao editar: " + e.getMessage());
+        }
+    }
+
+    private static void menuRemocao() {
+        System.out.println("\n--- 🗑️ REMOÇÃO (ZONA DE PERIGO) ---");
+        System.out.println("1. Remover Aluno");
+        System.out.println("2. Remover Professor");
+        System.out.println("3. Remover Modalidade");
+        System.out.print("Opção: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Digite o ID para remover (Sem volta): ");
+        int id = scanner.nextInt();
+
+        boolean sucesso = false;
+        if (op == 1) sucesso = servico.removerAluno(id);
+        else if (op == 2) sucesso = servico.removerProfessor(id);
+        else if (op == 3) sucesso = servico.removerModalidade(id);
+
+        if (sucesso) System.out.println("✅ Removido! Foi tarde.");
+        else System.out.println("❌ ID não encontrado.");
+    }
+
+    // --- CADASTROS SIMPLIFICADOS ---
+
+    private static void cadastrarAluno() {
+        System.out.print("Nome: "); String nome = scanner.nextLine();
+        System.out.print("Idade: "); int idade = scanner.nextInt(); scanner.nextLine();
+
+        String aut = "SIM";
+        if (idade < 18) {
+            System.out.print("Autorização (SIM/NAO): "); aut = scanner.nextLine();
+        }
+
+        System.out.println("Plano: [1] Mensal | [2] VIP");
+        int p = scanner.nextInt();
+        Plano plano = (p == 2) ? new PlanoVip(99) : new PlanoBasico(10, "Mensal");
+
+        try {
+            servico.cadastrarNovoAluno(nome, idade, aut, plano);
+            System.out.println("✅ Aluno Salvo!");
+        } catch (Exception e) { System.out.println("Erro: " + e.getMessage()); }
+    }
+
+    private static void cadastrarProfessor() {
+        System.out.print("Nome: "); String nome = scanner.nextLine();
+        System.out.print("Registro: "); String reg = scanner.nextLine();
+        System.out.print("Especialidade: "); String esp = scanner.nextLine();
+        servico.cadastrarProfessor(nome, reg, esp);
+    }
+
+    private static void cadastrarModalidade() {
+        System.out.print("Nome: "); String nome = scanner.nextLine();
+        System.out.print("Descricao: "); String desc = scanner.nextLine();
+        servico.cadastrarModalidade(nome, desc);
+    }
+
+    private static void agendarAula() {
+        try {
+            System.out.print("ID Modalidade: "); int mId = scanner.nextInt();
+            System.out.print("ID Professor: "); int pId = scanner.nextInt(); scanner.nextLine();
+            System.out.print("Horario: "); String hora = scanner.nextLine();
+            System.out.print("Dia: "); String dia = scanner.nextLine();
+            System.out.print("VIP? (true/false): "); boolean vip = scanner.nextBoolean();
+            servico.agendarNovaAula(mId, pId, hora, dia, vip);
+            System.out.println("✅ Aula agendada!");
+        } catch (Exception e) { System.out.println("Erro: " + e.getMessage()); }
+    }
+
+    private static void gerarRelatorioPDF() {
+        System.out.println("Gerando relatório... Cruzando os dedos...");
+        new GeradorDeRelatorio().gerarRelatorioCompleto(
+                servico.getTodosAlunos(),
+                servico.getTodosProfessores(),
+                servico.getTodasModalidades(),
+                "Relatorio_Geral_FitLife.pdf"
+        );
+    }
+
+    private static void inicializarDadosTeste() {
+        if(servico.getTodasModalidades().isEmpty()) {
+            servico.cadastrarModalidade("Musculacao", "Geral");
+            servico.cadastrarProfessor("Padrao", "001", "Geral");
+        }
     }
 }

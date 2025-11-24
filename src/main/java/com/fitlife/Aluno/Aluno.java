@@ -6,7 +6,7 @@ public class Aluno {
     private long id;
     private String nome;
     private Integer idade;
-    private Plano plano;
+    private Plano plano; // Composição: O Aluno TEM UM Plano
 
     public Aluno(long id, String nome, Integer idade, Plano plano) {
         this.id = id;
@@ -15,6 +15,7 @@ public class Aluno {
         this.plano = plano;
     }
 
+    // Construtor que lê do CSV.
     public Aluno(String csvLine) throws Exception {
         String[] dados = csvLine.split(";");
         if (dados.length != 4) {
@@ -27,21 +28,32 @@ public class Aluno {
             this.idade = Integer.parseInt(dados[2].trim());
             int planoId = Integer.parseInt(dados[3].trim());
 
+            // Chama a fábrica de planos. Se o ID for 4 ou 99, vira VIP
             this.plano = Plano.criarPlanoPorId(planoId, "Nome Placeholder");
 
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Erro de formato numérico no Aluno CSV.");
+            throw new IllegalArgumentException("Erro de formato numérico. Alguém digitou letra onde era número.");
         }
     }
 
+    // Transforma o objeto de volta em texto para salvar no arquivo (Persistência).
     public String toCSV() {
         long planoId = (plano != null) ? plano.getId() : 0;
         return id + ";" + nome + ";" + idade + ";" + planoId;
     }
 
+    // Getters e Setters
     public long getId() { return id; }
     public String getNome() { return nome; }
     public Integer getIdade() { return idade; }
     public Plano getPlano() { return plano; }
     public void setPlano(Plano plano) { this.plano = plano; }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setIdade(Integer idade) {
+        this.idade = idade;
+    }
 }
